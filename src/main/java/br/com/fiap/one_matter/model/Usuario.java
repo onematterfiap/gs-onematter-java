@@ -54,6 +54,21 @@ public class Usuario implements UserDetails {
     @Column(name = "tp_usuario", nullable = false)
     private UsuarioRole role;
 
+    @Column(name = "dt_nascimento")
+    private Instant dataNascimento;
+
+    @Column(name = "genero", length = 10)
+    private String genero;
+
+    @Column(name = "nr_telefone", length = 10)
+    private String telefone;
+
+    @OneToMany(mappedBy = "candidato", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Formacao> formacoes;
+
+    @OneToMany(mappedBy = "candidato", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Candidatura> candidaturas;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.getAuthority()));

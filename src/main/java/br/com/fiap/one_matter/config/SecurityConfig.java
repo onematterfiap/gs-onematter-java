@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity; // 💡 IMPORTANTE
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity(prePostEnabled = true) // 💡 HABILITA O @PreAuthorize NOS CONTROLLERS
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
@@ -36,16 +38,32 @@ public class SecurityConfig {
                                 "/auth/refresh"
                         ).permitAll()
 
-                        // Rotas autenticadas para usuários comuns
+                        // Rotas públicas de GET (Listar/Ver Vagas)
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/vagas",
+                                "/vagas/{id:[0-9]+}" // Permite GET por ID
+                        ).permitAll()
+
+                        // Rotas autenticadas para usuários (Candidatos)
                         .requestMatchers("/usuarios/me").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/usuarios/me").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/usuarios/me").authenticated()
 
+                        // Novas rotas de Candidato (USER)
+                        .requestMatchers("/candidato/me/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/vagas/{idVaga}/candidatar").hasRole("USER")
 
-                        // Rotas autenticadas para usuários administradores
-                        .requestMatchers(HttpMethod.POST, "/admin/users").authenticated()
+                        // Novas rotas de ADMIN (Gerenciamento)
+                        .requestMatchers("/admin/users/**").hasRole("ADMIN")
+                        .requestMatchers("/vagas/**").hasRole("ADMIN") // Protege POST/PUT/DELETE de /vagas
+                        .requestMatchers("/empresas/**").hasRole("ADMIN")
+                        .requestMatchers("/recrutadores/**").hasRole("ADMIN")
+                        .requestMatchers("/skills/**").hasRole("ADMIN")
+                        .requestMatchers("/questoes/**").hasRole("ADMIN") // Rota de Questões
+                        .requestMatchers("/testes/**").hasRole("ADMIN")   // Rota de Testes
 
-                        // Rotas públicas de documentação
+                        // Rotas públicas de documentação e H2
                         .requestMatchers(
                                 "/h2-console/**",
                                 "/swagger-ui.html",
@@ -58,7 +76,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())) // Para H2
                 .build();
     }
 

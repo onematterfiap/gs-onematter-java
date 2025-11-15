@@ -98,7 +98,11 @@ public class AuthController {
                 usuarioSalvo.getNome(),
                 usuarioSalvo.getEmail(),
                 usuarioSalvo.getRole(),
-                usuarioSalvo.getDataCriacao()
+                usuarioSalvo.getDataCriacao(),
+                usuarioSalvo.getCpf(),
+                usuarioSalvo.getDataNascimento(),
+                usuarioSalvo.getGenero(),
+                usuarioSalvo.getTelefone()
         );
 
         // Adiciona os Links HATEOAS (Nível 3)

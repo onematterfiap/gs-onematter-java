@@ -24,6 +24,19 @@ public class UsuarioGerenciamentoService {
     }
 
     @Transactional
+    public Usuario buscarPerfilCompletoPorId(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
+
+        // Força a inicialização das coleções lazy dentro da transação para o DTO
+        usuario.getUsuarioSkills().size();
+        usuario.getFormacoes().size();
+        usuario.getCandidaturas().forEach(c -> c.getStatusHistorico().size());
+
+        return usuario;
+    }
+
+    @Transactional
     public Usuario atualizar(String email, AtualizarUsuarioDto dto) {
         Usuario usuario = buscarPorEmail(email);
 
@@ -33,6 +46,14 @@ public class UsuarioGerenciamentoService {
 
         if (dto.role() != null) {
             usuario.setRole(dto.role());
+        }
+
+        if (dto.genero() != null) {
+            usuario.setGenero(dto.genero());
+        }
+
+        if (dto.telefone() != null && !dto.telefone().isBlank()) {
+            usuario.setTelefone(dto.telefone());
         }
 
         return usuario;
@@ -48,10 +69,8 @@ public class UsuarioGerenciamentoService {
 
     public Page<Usuario> listar(Optional<Integer> deletedStatus, Pageable pageable) {
         if (deletedStatus.isPresent() && (deletedStatus.get() == 0 || deletedStatus.get() == 1)) {
-            // Se o filtro for 0 (ativo) ou 1 (deletado), usa metodo filtrado
             return usuarioRepository.findByDeleted(deletedStatus.get(), pageable);
         }
-        // Se o filtro estiver ausente ou inválido, lista TODOS (ativos e deletados)
         return usuarioRepository.findAll(pageable);
     }
 }

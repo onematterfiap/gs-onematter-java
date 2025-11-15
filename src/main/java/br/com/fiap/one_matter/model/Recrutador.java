@@ -41,12 +41,16 @@ public class Recrutador {
     private String telefone;
 
     @NotNull
-    @Column(name = "cpf", length = 10, unique = true)
+    @Column(name = "cpf", length = 11, unique = true)
     private String cpf;
 
     @NotNull
     @Column(name = "email", length = 30, unique = true)
     private String email;
+
+    @NotNull
+    @Column(name = "senha_hash", nullable = false)
+    private String senhaHash;
 
     // Relacionamentos
     @NotNull

@@ -1,6 +1,7 @@
 package br.com.fiap.one_matter.model;
 
 import br.com.fiap.one_matter.enums.UsuarioRole;
+import br.com.fiap.one_matter.enums.Genero;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_usuario")
+    @Column(name = "id_candidato")
     private Long id;
 
     @CreationTimestamp
@@ -34,7 +35,7 @@ public class Usuario implements UserDetails {
     private Instant dataCriacao;
 
     @NotNull
-    @Column(name = "nm_usuario", nullable = false)
+    @Column(name = "nm_candidato", nullable = false)
     private String nome;
 
     @NotNull
@@ -54,20 +55,30 @@ public class Usuario implements UserDetails {
     @Column(name = "tp_usuario", nullable = false)
     private UsuarioRole role;
 
-    @Column(name = "dt_nascimento")
+    @NotNull
+    @Column(name = "cpf", length = 11, unique = true, nullable = false)
+    private String cpf;
+
+    @NotNull
+    @Column(name = "dt_nascimento", nullable = false)
     private Instant dataNascimento;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "genero", length = 10)
-    private String genero;
+    private Genero genero;
 
-    @Column(name = "nr_telefone", length = 10)
+    @Column(name = "nr_telefone", length = 13)
     private String telefone;
 
+    // RELACIONAMENTOS DO CANDIDATO
     @OneToMany(mappedBy = "candidato", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Formacao> formacoes;
 
     @OneToMany(mappedBy = "candidato", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Candidatura> candidaturas;
+
+    @OneToMany(mappedBy = "candidato", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<UsuarioSkill> usuarioSkills;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -75,14 +86,10 @@ public class Usuario implements UserDetails {
     }
 
     @Override
-    public String getPassword() {
-        return this.senhaHash;
-    }
+    public String getPassword() { return this.senhaHash; }
 
     @Override
-    public String getUsername() {
-        return this.email;
-    }
+    public String getUsername() { return this.email; }
 
     @Override
     public boolean isAccountNonExpired() { return true; }
@@ -94,7 +101,5 @@ public class Usuario implements UserDetails {
     public boolean isCredentialsNonExpired() { return true; }
 
     @Override
-    public boolean isEnabled() {
-        return this.deleted == 0;
-    }
+    public boolean isEnabled() { return this.deleted == 0; }
 }

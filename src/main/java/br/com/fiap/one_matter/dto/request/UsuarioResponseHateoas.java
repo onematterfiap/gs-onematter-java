@@ -1,5 +1,6 @@
 package br.com.fiap.one_matter.dto.request;
 
+import br.com.fiap.one_matter.enums.Genero;
 import br.com.fiap.one_matter.enums.UsuarioRole;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
@@ -13,12 +14,20 @@ public class UsuarioResponseHateoas extends RepresentationModel<UsuarioResponseH
     private final String email;
     private final UsuarioRole role;
     private final Instant dataCriacao;
+    private final String cpf;
+    private final Instant dataNascimento;
+    private final Genero genero;
+    private final String telefone;
 
-    public UsuarioResponseHateoas(Long id, String nome, String email, UsuarioRole role, Instant dataCriacao) {
+    public UsuarioResponseHateoas(Long id, String nome, String email, UsuarioRole role, Instant dataCriacao, String cpf, Instant dataNascimento, Genero genero, String telefone) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.role = role;
         this.dataCriacao = dataCriacao;
+        this.cpf = cpf;
+        this.dataNascimento = dataNascimento;
+        this.genero = genero;
+        this.telefone = telefone;
     }
 }

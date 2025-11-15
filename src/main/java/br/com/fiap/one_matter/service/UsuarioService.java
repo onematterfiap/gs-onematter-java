@@ -1,7 +1,7 @@
 package br.com.fiap.one_matter.service;
 
 import br.com.fiap.one_matter.dto.request.CadastroUsuarioDto;
-import br.com.fiap.one_matter.dto.request.CadastroUsuarioGerenciadoDto; // NOVO IMPORT
+import br.com.fiap.one_matter.dto.request.CadastroUsuarioGerenciadoDto;
 import br.com.fiap.one_matter.model.Usuario;
 import br.com.fiap.one_matter.enums.UsuarioRole;
 import br.com.fiap.one_matter.repository.UsuarioRepository;
@@ -20,10 +20,10 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
-    // Força a role USER
+
     @Transactional
     public Usuario criarDefaultUser(CadastroUsuarioDto dto) {
-        validarNovoUsuario(dto.email());
+        validarNovoUsuario(dto.email(), dto.cpf());
 
         String senhaHash = passwordEncoder.encode(dto.senha());
 
@@ -31,9 +31,16 @@ public class UsuarioService {
                 .nome(dto.nome())
                 .email(dto.email())
                 .senhaHash(senhaHash)
-                .role(UsuarioRole.USER) // FORÇA A ROLE USER
+                .role(UsuarioRole.USER)
                 .dataCriacao(Instant.now())
                 .deleted(0)
+
+                // MAPEAMENTO DOS NOVOS CAMPOS
+                .cpf(dto.cpf())
+                .dataNascimento(dto.dataNascimento())
+                .genero(dto.genero())
+                .telefone(dto.telefone())
+
                 .build();
 
         return usuarioRepository.save(novoUsuario);
@@ -42,7 +49,7 @@ public class UsuarioService {
     // Permite definir qualquer role
     @Transactional
     public Usuario criarGerenciado(CadastroUsuarioGerenciadoDto dto) {
-        validarNovoUsuario(dto.email());
+        validarNovoUsuario(dto.email(), dto.cpf());
 
         String senhaHash = passwordEncoder.encode(dto.senha());
 
@@ -50,18 +57,31 @@ public class UsuarioService {
                 .nome(dto.nome())
                 .email(dto.email())
                 .senhaHash(senhaHash)
-                .role(dto.role()) // LÊ A ROLE DO DTO GERENCIADO
+                .role(dto.role())
                 .dataCriacao(Instant.now())
                 .deleted(0)
+
+                // MAPEAMENTO DOS NOVOS CAMPOS
+                .cpf(dto.cpf())
+                .dataNascimento(dto.dataNascimento())
+                .genero(dto.genero())
+                .telefone(dto.telefone())
+
                 .build();
 
         return usuarioRepository.save(novoUsuario);
     }
 
-    private void validarNovoUsuario(String email) {
-        Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(email);
-        if (usuarioExistente.isPresent()) {
+    private void validarNovoUsuario(String email, String cpf) {
+        Optional<Usuario> usuarioExistentePorEmail = usuarioRepository.findByEmailAndDeleted(email, 0);
+        if (usuarioExistentePorEmail.isPresent()) {
             throw new DataIntegrityViolationException("Já existe um usuário ativo com este e-mail.");
+        }
+
+        // Nova validação de CPF
+        Optional<Usuario> usuarioExistentePorCpf = usuarioRepository.findByCpfAndDeleted(cpf, 0);
+        if (usuarioExistentePorCpf.isPresent()) {
+            throw new DataIntegrityViolationException("Já existe um usuário ativo com este CPF.");
         }
     }
 }

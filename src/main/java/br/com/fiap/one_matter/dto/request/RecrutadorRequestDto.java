@@ -12,11 +12,14 @@ public record RecrutadorRequestDto(
         @Size(max = 11)
         String telefone,
 
-        @NotBlank @Size(min = 10, max = 10) // Ajuste conforme seu BD (CPF 10?)
+        @NotBlank @Size(min = 11, max = 11)
         String cpf,
 
         @NotBlank @Email @Size(max = 30)
         String email,
+
+        @NotBlank @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres.")
+        String senha,
 
         @NotNull
         Long idEmpresa

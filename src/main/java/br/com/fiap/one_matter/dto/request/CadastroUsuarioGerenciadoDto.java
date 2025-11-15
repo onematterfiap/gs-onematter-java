@@ -1,10 +1,13 @@
 package br.com.fiap.one_matter.dto.request;
 
+import br.com.fiap.one_matter.enums.Genero;
 import br.com.fiap.one_matter.enums.UsuarioRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import java.time.Instant;
 
 public record CadastroUsuarioGerenciadoDto(
         @NotBlank(message = "O nome não pode ser vazio.")
@@ -20,5 +23,18 @@ public record CadastroUsuarioGerenciadoDto(
         String senha,
 
         @NotNull(message = "A role (papel) do usuário é obrigatória.")
-        UsuarioRole role
+        UsuarioRole role,
+
+        @NotBlank(message = "O CPF não pode ser vazio.")
+        @Size(min = 11, max = 11, message = "O CPF deve ter 11 dígitos.")
+        String cpf,
+
+        @NotNull(message = "A data de nascimento é obrigatória.")
+        Instant dataNascimento,
+
+        @NotNull(message = "O gênero é obrigatório.")
+        Genero genero,
+
+        @Size(max = 13, message = "O telefone deve ter no máximo 13 caracteres.")
+        String telefone
 ) {}

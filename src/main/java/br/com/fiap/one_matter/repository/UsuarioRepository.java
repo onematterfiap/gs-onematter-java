@@ -10,6 +10,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     Optional<Usuario> findByEmailAndDeleted(String email, Integer deleted);
 
+    Optional<Usuario> findByCpfAndDeleted(String cpf, Integer deleted);
+
     default Optional<Usuario> findByEmail(String email) {
         return findByEmailAndDeleted(email, 0);
     }

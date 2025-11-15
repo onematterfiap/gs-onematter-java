@@ -1,7 +1,7 @@
 package br.com.fiap.one_matter.controller;
 
 import br.com.fiap.one_matter.dto.request.CadastroUsuarioGerenciadoDto;
-import br.com.fiap.one_matter.dto.request.UsuarioResponseHateoas;
+import br.com.fiap.one_matter.dto.response.UsuarioPerfilCompletoDto;
 import br.com.fiap.one_matter.dto.response.UsuarioListagemDto;
 import br.com.fiap.one_matter.model.Usuario;
 import br.com.fiap.one_matter.service.UsuarioGerenciamentoService;
@@ -14,7 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.PagedModel; // 💡 CORRIGIDO: PagedModel é do Spring HATEOAS
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,28 +33,21 @@ public class GerenciamentoController {
 
     private final UsuarioService usuarioService;
     private final UsuarioGerenciamentoService usuarioGerenciamentoService;
-
     private final PagedResourcesAssembler<UsuarioListagemDto> pagedResourcesAssembler;
 
     @PostMapping
-    public ResponseEntity<UsuarioResponseHateoas> criarUsuarioGerenciado(@RequestBody @Valid CadastroUsuarioGerenciadoDto dados) {
+    public ResponseEntity<UsuarioPerfilCompletoDto> criarUsuarioGerenciado(@RequestBody @Valid CadastroUsuarioGerenciadoDto dados) {
 
         Usuario usuarioSalvo = usuarioService.criarGerenciado(dados);
 
-        UsuarioResponseHateoas respostaHateoas = new UsuarioResponseHateoas(
-                usuarioSalvo.getId(),
-                usuarioSalvo.getNome(),
-                usuarioSalvo.getEmail(),
-                usuarioSalvo.getRole(),
-                usuarioSalvo.getDataCriacao()
-        );
+        Usuario perfil = usuarioGerenciamentoService.buscarPerfilCompletoPorId(usuarioSalvo.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(UsuarioPerfilCompletoDto.fromUsuario(perfil));
+    }
 
-        respostaHateoas.add(
-                linkTo(methodOn(GerenciamentoController.class).criarUsuarioGerenciado(null))
-                        .withSelfRel().withType("POST")
-        );
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(respostaHateoas);
+    @GetMapping("/{id}")
+    public ResponseEntity<UsuarioPerfilCompletoDto> buscarUsuarioPorId(@PathVariable Long id) {
+        Usuario usuario = usuarioGerenciamentoService.buscarPerfilCompletoPorId(id);
+        return ResponseEntity.ok(UsuarioPerfilCompletoDto.fromUsuario(usuario));
     }
 
     @GetMapping
@@ -64,17 +57,19 @@ public class GerenciamentoController {
 
         Page<Usuario> usuariosPage = usuarioGerenciamentoService.listar(deleted, pageable);
 
-        // Mapeia Page<Usuario> para Page<UsuarioListagemDto>
         Page<UsuarioListagemDto> dtoPage = usuariosPage.map(usuario -> new UsuarioListagemDto(
                 usuario.getId(),
                 usuario.getNome(),
                 usuario.getEmail(),
                 usuario.getRole(),
                 usuario.getDataCriacao(),
-                usuario.getDeleted()
+                usuario.getDeleted(),
+                usuario.getCpf(),
+                usuario.getDataNascimento(),
+                usuario.getGenero(),
+                usuario.getTelefone()
         ));
 
-        // Converte a Page para PagedModel, resolvendo o WARN
         PagedModel<EntityModel<UsuarioListagemDto>> pagedModel = pagedResourcesAssembler.toModel(dtoPage);
 
         return ResponseEntity.ok(pagedModel);

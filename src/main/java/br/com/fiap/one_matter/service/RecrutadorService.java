@@ -8,6 +8,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +19,8 @@ import java.util.Optional;
 public class RecrutadorService {
 
     private final RecrutadorRepository recrutadorRepository;
-    private final EmpresaService empresaService; // Reusa a busca de empresa
+    private final EmpresaService empresaService;
+    private final PasswordEncoder passwordEncoder;
 
     public Page<Recrutador> listar(Optional<Integer> deletedStatus, Pageable pageable) {
         if (deletedStatus.isPresent() && (deletedStatus.get() == 0 || deletedStatus.get() == 1)) {
@@ -36,11 +38,14 @@ public class RecrutadorService {
     public Recrutador criar(RecrutadorRequestDto dto) {
         Empresa empresa = empresaService.buscarPorIdAtiva(dto.idEmpresa());
 
+        String senhaHash = passwordEncoder.encode(dto.senha());
+
         Recrutador recrutador = Recrutador.builder()
                 .nome(dto.nome())
                 .telefone(dto.telefone())
                 .cpf(dto.cpf())
                 .email(dto.email())
+                .senhaHash(senhaHash)
                 .empresa(empresa)
                 .deleted(0)
                 .build();
@@ -60,6 +65,12 @@ public class RecrutadorService {
         recrutador.setTelefone(dto.telefone());
         recrutador.setCpf(dto.cpf());
         recrutador.setEmail(dto.email());
+
+        if (dto.senha() != null && !dto.senha().isBlank()) {
+            String senhaHash = passwordEncoder.encode(dto.senha());
+            recrutador.setSenhaHash(senhaHash);
+        }
+
         return recrutador;
     }
 

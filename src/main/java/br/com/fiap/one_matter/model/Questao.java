@@ -18,7 +18,8 @@ import java.util.List;
 public class Questao {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "seq_questao", sequenceName = "SQ_ONEM_QUESTAO", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_questao")
     @Column(name = "id_questao")
     private Long id;
 
@@ -39,10 +40,6 @@ public class Questao {
     private String alternativa4;
     @Column(name = "alternativa_5", length = 255)
     private String alternativa5;
-
-    // (Faltou a resposta correta no diagrama, mas seria ideal ter)
-    // @Column(name = "nr_resposta_correta")
-    // private Integer respostaCorreta;
 
     @OneToMany(mappedBy = "questao", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TesteQuestao> testeQuestoes;

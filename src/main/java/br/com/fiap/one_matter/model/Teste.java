@@ -19,7 +19,8 @@ import java.util.List;
 public class Teste {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "seq_teste", sequenceName = "SQ_ONEM_TESTE", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_teste")
     @Column(name = "id_teste")
     private Long id;
 
@@ -31,9 +32,8 @@ public class Teste {
     private Instant dataFim;
 
     @Column(name = "pontuacao_teste")
-    private Double pontuacao; // (NUMERIC(100) é muito grande, ajustei)
+    private Double pontuacao;
 
-    // Relacionamentos
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_vaga", nullable = false)

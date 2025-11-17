@@ -1,42 +1,47 @@
 server:
-    port: ${SERVER_PORT:8080}
-    servlet:
-        context-path: /api
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /api
 
 spring:
-    application:
-        name: one-matter
+  application:
+    name: one-matter
 
-    # Configuração para H2 (fácil para testes locais)
-    datasource:
-        url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;
-        driver-class-name: org.h2.Driver
-        username: sa
-        password: password
+  # Pode colocar as suas credenciais do banco da FIAP ou usar a minha, tanto faz
+  datasource:
+    url: jdbc:oracle:thin:@oracle.fiap.com.br:1521:ORCL
+    username: rm559728
+    password: 250306
+    driver-class-name: oracle.jdbc.OracleDriver
+    hikari:
+      maximum-pool-size: 2
+      minimum-idle: 0
+      idle-timeout: 20000
+      max-lifetime: 300000
+      connection-timeout: 30000
+      validation-timeout: 5000
+      connection-test-query: SELECT 1 FROM DUAL
 
+  sql:
+    init:
+      mode: never     # ← mudar pra always caso seja a primeira vez rodando
 
-    sql:
-        init:
-            # Garante que o script de inicialização do H2 seja executado
-            mode: always
-
-    jpa:
-        # 💡 CORREÇÃO: Força o Spring a esperar que o Hibernate crie o schema antes de rodar o data.sql
-        defer-datasource-initialization: true
-        hibernate:
-            # Cria/atualiza o esquema no startup
-            ddl-auto: create-drop
-        show-sql: true
-        properties:
-            hibernate:
-                format_sql: true
+  jpa:
+    defer-datasource-initialization: false
+    database-platform: org.hibernate.dialect.OracleDialect
+    hibernate:
+      ddl-auto: none   # ← mudar para create caso seja a primeira vez rodando
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
 jwt:
-    secret: aec3ec1f-53aa-4e82-93e7-702ab0194b80
-    expiration: 86400000
-    refresh-expiration: 604800000
+  secret: aec3ec1f-53aa-4e82-93e7-702ab0194b80
+  expiration: 86400000
+  refresh-expiration: 604800000
 
 logging:
-    level:
-        org.springframework.security: DEBUG
-        br.com.fiap.medix_api.config: DEBUG
+  level:
+    org.springframework.security: DEBUG
+    br.com.fiap.one_matter: TRACE

@@ -20,7 +20,8 @@ import java.util.List;
 public class Recrutador {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "seq_recrutador", sequenceName = "SQ_ONEM_RECRUTADOR", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_recrutador")
     @Column(name = "id_recrutador")
     private Long id;
 
@@ -52,7 +53,6 @@ public class Recrutador {
     @Column(name = "senha_hash", nullable = false)
     private String senhaHash;
 
-    // Relacionamentos
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_empresa", nullable = false)

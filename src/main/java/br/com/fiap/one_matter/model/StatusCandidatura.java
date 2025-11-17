@@ -19,7 +19,8 @@ import java.time.Instant;
 public class StatusCandidatura {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "seq_status_cand", sequenceName = "SQ_ONEM_STATUS_CAND", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_status_cand")
     @Column(name = "id_status_candidatura")
     private Long id;
 
@@ -29,9 +30,8 @@ public class StatusCandidatura {
 
     @NotNull
     @Column(name = "ds_status", length = 30)
-    private String statusDescricao; // Ex: "EM_ANALISE", "TESTE_REALIZADO"
+    private String statusDescricao;
 
-    // Relacionamento
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_candidatura", nullable = false)

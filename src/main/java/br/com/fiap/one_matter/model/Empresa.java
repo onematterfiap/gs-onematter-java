@@ -20,7 +20,8 @@ import java.util.List;
 public class Empresa {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "seq_empresa", sequenceName = "SQ_ONEM_EMPRESA", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_empresa")
     @Column(name = "id_empresa")
     private Long id;
 
@@ -51,7 +52,6 @@ public class Empresa {
     @Column(name = "email", length = 30, unique = true)
     private String email;
 
-    // Relacionamentos
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Recrutador> recrutadores;
 

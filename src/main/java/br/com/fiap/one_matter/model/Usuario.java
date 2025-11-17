@@ -26,7 +26,8 @@ import java.util.List;
 public class Usuario implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "seq_candidato", sequenceName = "SQ_ONEM_CANDIDATO", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_candidato")
     @Column(name = "id_candidato")
     private Long id;
 
@@ -70,7 +71,6 @@ public class Usuario implements UserDetails {
     @Column(name = "nr_telefone", length = 13)
     private String telefone;
 
-    // RELACIONAMENTOS DO CANDIDATO
     @OneToMany(mappedBy = "candidato", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Formacao> formacoes;
 

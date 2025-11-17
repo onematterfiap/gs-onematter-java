@@ -20,7 +20,8 @@ import java.util.List;
 public class Candidatura {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "seq_candidatura", sequenceName = "SQ_ONEM_CANDIDATURA", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_candidatura")
     @Column(name = "id_candidatura")
     private Long id;
 
@@ -33,7 +34,6 @@ public class Candidatura {
     @Builder.Default
     private Integer deleted = 0;
 
-    // Relacionamento (Usuario é o Candidato)
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_candidato", nullable = false)

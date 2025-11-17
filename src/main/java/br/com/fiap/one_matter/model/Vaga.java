@@ -20,7 +20,8 @@ import java.util.List;
 public class Vaga {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "seq_vaga", sequenceName = "SQ_ONEM_VAGA", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_vaga")
     @Column(name = "id_vaga")
     private Long id;
 
@@ -37,7 +38,6 @@ public class Vaga {
     @Column(name = "ds_vaga", length = 255)
     private String descricao;
 
-    // Relacionamentos
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_empresa", nullable = false)

@@ -19,7 +19,8 @@ import java.time.Instant;
 public class Formacao {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "seq_formacao", sequenceName = "SQ_ONEM_FORMACAO", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_formacao")
     @Column(name = "id_formacao")
     private Long id;
 
@@ -45,7 +46,6 @@ public class Formacao {
     @Column(name = "dt_fim")
     private Instant dataFim;
 
-    // Relacionamento (Usuario é o Candidato)
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_candidato", nullable = false)
